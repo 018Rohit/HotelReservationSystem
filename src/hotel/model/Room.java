@@ -1,12 +1,16 @@
-public class Room {
+package hotel.model;
+
+import java.io.Serializable;
+
+public class Room implements Serializable {
     private int roomNumber;
     private String category;
     private boolean isBooked;
 
-    public Room(int roomNumber, String category, boolean isBooked) {
+    public Room(int roomNumber, String category) {
         this.roomNumber = roomNumber;
         this.category = category;
-        this.isBooked = isBooked;
+        this.isBooked = false;
     }
 
     public int getRoomNumber() { return roomNumber; }
@@ -16,6 +20,7 @@ public class Room {
 
     @Override
     public String toString() {
-        return "Room " + roomNumber + " (" + category + ") - " + (isBooked ? "Booked" : "Available");
+        return "Room " + roomNumber + " (" + category + ") " +
+               (isBooked ? "Booked" : "Available");
     }
 }
