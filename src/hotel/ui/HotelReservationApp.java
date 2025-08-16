@@ -19,24 +19,52 @@ public class HotelReservationApp extends JFrame {
         roomService = new RoomService();
         bookingService = new BookingService();
 
-        setTitle("Hotel Reservation System");
-        setSize(600, 400);
+        setTitle("🏨 Hotel Reservation System");
+        setSize(800, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        // 🎨 Apply modern look
+        UIManager.put("TabbedPane.selected", new Color(52, 152, 219));
+        UIManager.put("TabbedPane.contentAreaColor", Color.WHITE);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.add("Book Room", createBookPanel());
-        tabs.add("Manage Bookings", createManagePanel());
-        tabs.add("Add Room", createAddRoomPanel());
-        tabs.add("Availability", createAvailabilityPanel());
+        tabs.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        tabs.add("🛎 Book Room", createBookPanel());
+        tabs.add("📋 Manage Bookings", createManagePanel());
+        tabs.add("➕ Add Room", createAddRoomPanel());
+        tabs.add("✅ Availability", createAvailabilityPanel());
 
         add(tabs);
     }
 
+    // 🔹 Modern Button Factory
+    private JButton createButton(String text, Color bg) {
+        JButton btn = new JButton(text);
+        btn.setBackground(bg);
+        btn.setForeground(Color.WHITE);
+        btn.setFocusPainted(false);
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setBorder(BorderFactory.createEmptyBorder(8, 15, 8, 15));
+        return btn;
+    }
+
     private JPanel createBookPanel() {
-        JPanel panel = new JPanel(new BorderLayout());
-        JTextField nameField = new JTextField();
-        JTextField roomNumberField = new JTextField();
-        JButton bookBtn = new JButton("Book with Fake Payment");
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(245, 247, 250));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel nameLabel = new JLabel("Customer Name:");
+        nameLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        JTextField nameField = new JTextField(15);
+
+        JLabel roomLabel = new JLabel("Room Number:");
+        roomLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        JTextField roomNumberField = new JTextField(15);
+
+        JButton bookBtn = createButton("Book with Fake Payment", new Color(46, 204, 113));
 
         bookBtn.addActionListener((ActionEvent e) -> {
             try {
@@ -45,7 +73,7 @@ public class HotelReservationApp extends JFrame {
                         .filter(r -> r.getRoomNumber() == roomNo && !r.isBooked())
                         .findFirst().orElse(null);
                 if (room == null) {
-                    JOptionPane.showMessageDialog(this, "Room not available!");
+                    JOptionPane.showMessageDialog(this, "❌ Room not available!");
                     return;
                 }
                 room.setBooked(true);
@@ -54,28 +82,38 @@ public class HotelReservationApp extends JFrame {
                 Booking booking = new Booking(roomNo, nameField.getText(), "Paid");
                 bookingService.addBooking(booking);
 
-                JOptionPane.showMessageDialog(this, "Booking Successful!");
+                JOptionPane.showMessageDialog(this, "✅ Booking Successful!");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Invalid Input!");
+                JOptionPane.showMessageDialog(this, "⚠ Invalid Input!");
             }
         });
 
-        panel.add(new JLabel("Customer Name:"), BorderLayout.NORTH);
-        panel.add(nameField, BorderLayout.CENTER);
-        JPanel south = new JPanel(new GridLayout(2, 1));
-        south.add(new JLabel("Room Number:"));
-        south.add(roomNumberField);
-        panel.add(south, BorderLayout.SOUTH);
-        panel.add(bookBtn, BorderLayout.EAST);
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(nameLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(nameField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1;
+        panel.add(roomLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(roomNumberField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
+        panel.add(bookBtn, gbc);
 
         return panel;
     }
 
     private JPanel createManagePanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+
         outputArea = new JTextArea();
-        JButton refreshBtn = new JButton("Show All Bookings");
-        JButton cancelBtn = new JButton("Cancel Booking");
+        outputArea.setFont(new Font("Consolas", Font.PLAIN, 14));
+        outputArea.setEditable(false);
+
+        JButton refreshBtn = createButton("🔄 Show All Bookings", new Color(52, 152, 219));
+        JButton cancelBtn = createButton("❌ Cancel Booking", new Color(231, 76, 60));
 
         refreshBtn.addActionListener(e -> {
             outputArea.setText("");
@@ -96,13 +134,14 @@ public class HotelReservationApp extends JFrame {
                         .filter(r -> r.getRoomNumber() == booking.getRoomNumber())
                         .forEach(r -> r.setBooked(false));
                 roomService.updateRooms();
-                JOptionPane.showMessageDialog(this, "Booking Cancelled!");
+                JOptionPane.showMessageDialog(this, "✅ Booking Cancelled!");
             } else {
-                JOptionPane.showMessageDialog(this, "Booking not found!");
+                JOptionPane.showMessageDialog(this, "❌ Booking not found!");
             }
         });
 
         JPanel top = new JPanel();
+        top.setBackground(new Color(245, 247, 250));
         top.add(refreshBtn);
         top.add(cancelBtn);
 
@@ -113,35 +152,58 @@ public class HotelReservationApp extends JFrame {
     }
 
     private JPanel createAddRoomPanel() {
-        JPanel panel = new JPanel(new GridLayout(3, 2));
-        JTextField numberField = new JTextField();
-        JTextField categoryField = new JTextField();
-        JButton addBtn = new JButton("Add Room");
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.setBackground(new Color(245, 247, 250));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel numberLabel = new JLabel("Room Number:");
+        numberLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        JTextField numberField = new JTextField(15);
+
+        JLabel categoryLabel = new JLabel("Category:");
+        categoryLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        JTextField categoryField = new JTextField(15);
+
+        JButton addBtn = createButton("➕ Add Room", new Color(155, 89, 182));
 
         addBtn.addActionListener(e -> {
             try {
                 int number = Integer.parseInt(numberField.getText());
                 String category = categoryField.getText();
                 roomService.addRoom(new Room(number, category));
-                JOptionPane.showMessageDialog(this, "Room Added!");
+                JOptionPane.showMessageDialog(this, "✅ Room Added!");
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Invalid Input!");
+                JOptionPane.showMessageDialog(this, "⚠ Invalid Input!");
             }
         });
 
-        panel.add(new JLabel("Room Number:"));
-        panel.add(numberField);
-        panel.add(new JLabel("Category:"));
-        panel.add(categoryField);
-        panel.add(addBtn);
+        gbc.gridx = 0; gbc.gridy = 0;
+        panel.add(numberLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(numberField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1;
+        panel.add(categoryLabel, gbc);
+        gbc.gridx = 1;
+        panel.add(categoryField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 2;
+        panel.add(addBtn, gbc);
 
         return panel;
     }
 
     private JPanel createAvailabilityPanel() {
         JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.WHITE);
+
         JTextArea availabilityArea = new JTextArea();
-        JButton showBtn = new JButton("Show Available Rooms");
+        availabilityArea.setFont(new Font("Consolas", Font.PLAIN, 14));
+        availabilityArea.setEditable(false);
+
+        JButton showBtn = createButton("✅ Show Available Rooms", new Color(41, 128, 185));
 
         showBtn.addActionListener(e -> {
             availabilityArea.setText("");
